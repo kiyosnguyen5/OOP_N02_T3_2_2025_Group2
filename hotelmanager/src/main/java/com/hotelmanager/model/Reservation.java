@@ -1,7 +1,7 @@
 package com.hotelmanager.model;
 
 public class Reservation {
-    private String reservationID;
+    public String reservationID;
     private Room room;
     private String customerDetails;
 
