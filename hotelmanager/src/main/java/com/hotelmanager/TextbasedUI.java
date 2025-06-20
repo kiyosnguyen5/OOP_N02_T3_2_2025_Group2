@@ -1,16 +1,20 @@
 package com.hotelmanager;
 
+import java.util.List;
+import java.util.Scanner;
+
 import com.hotelmanager.model.Reservation;
 import com.hotelmanager.model.Room;
 import com.hotelmanager.service.HotelRoomManager;
 
-import java.util.List;
-import java.util.Scanner;
-
-public class Main {
+public class TextbasedUI {
     public static void main(String[] args) {
         HotelRoomManager manager = new HotelRoomManager();
         Scanner scanner = new Scanner(System.in);
+
+        // Load data from files
+        manager.loadRoomsFromFile("rooms.txt");
+        manager.loadReservationsFromFile("reservations.txt");
 
         while (true) {
             System.out.println("\n--- Hotel Room Manager ---");
@@ -69,7 +73,7 @@ public class Main {
                     System.out.print("Enter reservation ID to cancel: ");
                     String resId = scanner.nextLine();
                     Reservation toCancel = null;
-                    for (Reservation res : manager.reservations) {
+                    for (Reservation res : manager.getReservations()) {
                         if (res.getReservationID().equals(resId)) {
                             toCancel = res;
                             break;
@@ -83,6 +87,9 @@ public class Main {
                     }
                     break;
                 case 5:
+                    // Save data to files before exit
+                    manager.saveRoomsToFile("rooms.txt");
+                    manager.saveReservationsToFile("reservations.txt");
                     System.out.println("Exiting...");
                     scanner.close();
                     return;
