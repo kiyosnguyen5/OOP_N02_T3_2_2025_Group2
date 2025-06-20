@@ -34,7 +34,6 @@ Hotel Room Manager là một công cụ quản lý phòng khách sạn với cá
 └── README.md # Tệp này```
 
 
----
 
 ### Hướng Dẫn Sử Dụng
 
