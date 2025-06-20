@@ -20,7 +20,7 @@ Hotel Room Manager là một công cụ quản lý phòng khách sạn với cá
 ---
 
 ### Cấu Trúc Dự Án
-''hotel-room-manager/
+'''hotel-room-manager/
 │
 ├── src/
 │ ├── com/
@@ -31,7 +31,7 @@ Hotel Room Manager là một công cụ quản lý phòng khách sạn với cá
 │ │ │ └── Main.java # Lớp chạy chính của ứng dụng
 │
 ├── bin/ # Thư mục chứa file .class sau khi biên dịch
-└── README.md # Tệp này''
+└── README.md # Tệp này'''
 
 
 ---
