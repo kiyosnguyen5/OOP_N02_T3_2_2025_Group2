@@ -35,6 +35,52 @@ Hotel Room Manager là một công cụ quản lý phòng khách sạn với cá
 ```
 
 
+##UML
+```+------------------------+
+|     HotelRoomManager    |
++------------------------+
+| - rooms: List<Room>     |
+| - reservations: List<Reservation> |
++------------------------+
+| + addRoom(room: Room): void |
+| + bookRoom(room: Room, customerDetails: String): Reservation |
+| + cancelBooking(reservation: Reservation): void |
+| + viewRooms(): List<Room> |
++------------------------+
+
+          |
+          | manages
+          |
+          v
+
++------------------------+
+|        Room             |
++------------------------+
+| - roomNumber: String    |
+| - roomType: String      |
+| - roomStatus: String    |
++------------------------+
+| + getRoomInfo(): String |
++------------------------+
+
+          ^
+          | used by
+          |
+          v
+
++------------------------+
+|     Reservation         |
++------------------------+
+| - reservationID: String |
+| - room: Room            |
+| - customerDetails: String |
++------------------------+
+| + getReservationDetails(): String |
++------------------------+
+
+```
+
+
 
 ### Hướng Dẫn Sử Dụng
 
