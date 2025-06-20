@@ -1,3 +1,8 @@
+
+/* Credit
+**Engineered by @kiyosnguyen5**  
+*Coded with GitHub Copilot (GPT-4.1)* */
+
 package com.hotelmanager;
 
 import java.util.Scanner;
