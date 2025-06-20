@@ -34,7 +34,6 @@ Hotel Room Manager là một công cụ quản lý phòng khách sạn với cá
 │ │ │ ├── ui/ # Các lớp liên quan tới giao diện Swing
 │ │ │ └── Main.java # Lớp chạy chính của ứng dụng
 │
-├── bin/ # Thư mục chứa file .class sau khi biên dịch
 └── README.md # Tệp này
 ```
 
