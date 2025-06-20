@@ -12,7 +12,7 @@ Hotel Room Manager là một công cụ quản lý phòng khách sạn với cá
 4) Giao diện người dùng đơn giản và dễ sử dụng, được thiết kế bằng javaswing
 
 **Structure** 
-hotel-room-manager/
+'hotel-room-manager/
 │
 ├── src/
 │   ├── com/
@@ -24,6 +24,7 @@ hotel-room-manager/
 │
 ├── bin/                       # Thư mục chứa file .class sau khi biên dịch
 └── README.md                  # Tệp này
+'
 
 **Hướng Dẫn Sử Dụng**
 Khi chạy ứng dụng, cửa sổ chính sẽ hiện ra danh sách các phòng.
