@@ -1,4 +1,4 @@
-package com.hotelmanager;
+package com.hotelmanager.UI;
 
 import java.util.List;
 import java.util.Scanner;

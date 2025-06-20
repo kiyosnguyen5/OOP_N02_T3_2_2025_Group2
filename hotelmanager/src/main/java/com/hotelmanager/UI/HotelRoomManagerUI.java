@@ -1,4 +1,4 @@
-package com.hotelmanager;
+package com.hotelmanager.UI;
 
 import java.awt.BorderLayout;
 import java.util.List;
