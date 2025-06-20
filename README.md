@@ -5,7 +5,7 @@
 
 **Hotel Room Manager** là một ứng dụng quản lý phòng khách sạn được phát triển bằng Java.  
 Ứng dụng hỗ trợ quản lý thông tin phòng, tình trạng phòng, và các dịch vụ liên quan.  
-Dự án sử dụng JDK 21 và triển khai trên nền tảng web với giao diện người dùng (UI) được thiết kế bằng Java Swing.
+Dự án sử dụng JDK 21 với giao diện người dùng (UI) được thiết kế bằng Java Swing.
 
 ---
 
