@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import com.hotelmanager.model.Reservation;
 import com.hotelmanager.model.Room;
+import java.time.LocalDate;
 
 public class HotelRoomManager {
     private List<Room> rooms = new ArrayList<>();
@@ -20,12 +20,17 @@ public class HotelRoomManager {
         rooms.add(room);
     }
 
-    public Reservation bookRoom(Room room, String customerDetails) {
-        if (!rooms.contains(room) || !"available".equalsIgnoreCase(room.getRoomStatus())) {
-            return null;
+    public Reservation bookRoom(Room room, String customerDetails, LocalDate checkIn, LocalDate checkOut) {
+        // Prevent double-booking
+        for (Reservation res : reservations) {
+            if (res.getRoom().getRoomNumber().equals(room.getRoomNumber())) {
+                if (!(checkOut.isBefore(res.getCheckInDate()) || checkIn.isAfter(res.getCheckOutDate()))) {
+                    return null; // Overlapping reservation
+                }
+            }
         }
         String reservationID = UUID.randomUUID().toString();
-        Reservation reservation = new Reservation(reservationID, room, customerDetails);
+        Reservation reservation = new Reservation(reservationID, room, customerDetails, checkIn, checkOut);
         reservations.add(reservation);
         room.setRoomStatus("booked");
         return reservation;
@@ -72,7 +77,9 @@ public class HotelRoomManager {
             for (Reservation res : reservations) {
                 writer.write(res.getReservationID() + "," +
                              res.getRoom().getRoomNumber() + "," +
-                             res.getCustomerDetails());
+                             res.getCustomerDetails() + "," +
+                             res.getCheckInDate() + "," +
+                             res.getCheckOutDate());
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -85,11 +92,13 @@ public class HotelRoomManager {
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",", 3);
-                if (parts.length == 3) {
+                String[] parts = line.split(",", 5);
+                if (parts.length == 5) {
                     Room room = findRoomByNumber(parts[1]);
                     if (room != null) {
-                        reservations.add(new Reservation(parts[0], room, parts[2]));
+                        LocalDate checkIn = LocalDate.parse(parts[3]);
+                        LocalDate checkOut = LocalDate.parse(parts[4]);
+                        reservations.add(new Reservation(parts[0], room, parts[2], checkIn, checkOut));
                         room.setRoomStatus("booked");
                     }
                 }
@@ -111,4 +120,34 @@ public class HotelRoomManager {
     public List<Reservation> getReservations() {
         return new ArrayList<>(reservations);
     }
+
+    public List<Room> getAvailableRooms(LocalDate checkIn, LocalDate checkOut) {
+        List<Room> available = new ArrayList<>();
+        for (Room room : rooms) {
+            boolean isAvailable = true;
+            for (Reservation res : reservations) {
+                if (res.getRoom().getRoomNumber().equals(room.getRoomNumber())) {
+                    if (!(checkOut.isBefore(res.getCheckInDate()) || checkIn.isAfter(res.getCheckOutDate()))) {
+                        isAvailable = false;
+                        break;
+                    }
+                }
+            }
+            if (isAvailable) available.add(room);
+        }
+        return available;
+    }
+
+    public List<Reservation> searchReservations(String customer, LocalDate date) {
+        List<Reservation> result = new ArrayList<>();
+        for (Reservation res : reservations) {
+            if ((customer == null || res.getCustomerDetails().toLowerCase().contains(customer.toLowerCase())) &&
+                (date == null || (!date.isBefore(res.getCheckInDate()) && !date.isAfter(res.getCheckOutDate())))) {
+                result.add(res);
+            }
+        }
+        return result;
+    }
+
+    // Add methods for editRoom, deleteRoom, etc. as needed
 }

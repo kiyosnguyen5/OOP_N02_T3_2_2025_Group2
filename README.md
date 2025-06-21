@@ -1,8 +1,8 @@
 ## Nhóm 2
-**Nguyễn Thanh Phong**
+**Nguyễn Thanh Phong**  
 **MSV:** 24100259
 
-**Đặng Đức Kiên**
+**Đặng Đức Kiên**  
 **MSV:** 24100323
 
 ## Hotel Room Manager
@@ -17,9 +17,13 @@ Dự án sử dụng JDK 21 với giao diện người dùng (UI) được thi�
 Hotel Room Manager là một công cụ quản lý phòng khách sạn với các tính năng chính như:
 
 1. Quản lý thông tin phòng (số phòng, loại phòng, tình trạng phòng).
-2. Đặt phòng và hủy phòng.
+2. Đặt phòng và hủy phòng với ngày nhận/trả phòng.
 3. Xem tình trạng phòng hiện tại (còn trống, đã đặt, đang sử dụng).
-4. Giao diện người dùng đơn giản và dễ sử dụng, được thiết kế bằng Java Swing.
+4. Tìm kiếm và xem danh sách đặt phòng theo tên khách hoặc ngày.
+5. Kiểm tra phòng trống theo khoảng ngày.
+6. Chỉnh sửa/xóa phòng.
+7. Giao diện người dùng hiện đại (Material Design) với Java Swing (FlatLaf).
+8. Giao diện dòng lệnh (Text-based UI) cho thao tác nhanh.
 
 ---
 
@@ -31,24 +35,29 @@ Hotel Room Manager là một công cụ quản lý phòng khách sạn với cá
 │ │ ├── hotelroommanager/
 │ │ │ ├── model/ # Các lớp mô hình dữ liệu như Room, Reservation
 │ │ │ ├── service/ # Logic nghiệp vụ, xử lý dữ liệu
-│ │ │ ├── ui/ # Các lớp liên quan tới giao diện Swing
+│ │ │ ├── ui/ # Các lớp liên quan tới giao diện Swing và Text-based
 │ │ │ └── Main.java # Lớp chạy chính của ứng dụng
 │
 └── README.md # Tệp này
 ```
 
-
-##UML
-```+------------------------+
-|     HotelRoomManager    |
+## UML
+```
 +------------------------+
-| - rooms: List<Room>     |
+|     HotelRoomManager   |
++------------------------+
+| - rooms: List<Room>    |
 | - reservations: List<Reservation> |
 +------------------------+
-| + addRoom(room: Room): void |
-| + bookRoom(room: Room, customerDetails: String): Reservation |
-| + cancelBooking(reservation: Reservation): void |
-| + viewRooms(): List<Room> |
+| + addRoom(room: Room): void
+| + editRoom(room: Room): void
+| + deleteRoom(room: Room): void
+| + bookRoom(room: Room, customerDetails: String, checkIn: LocalDate, checkOut: LocalDate): Reservation
+| + cancelBooking(reservation: Reservation): void
+| + viewRooms(): List<Room>
+| + getAvailableRooms(checkIn: LocalDate, checkOut: LocalDate): List<Room>
+| + getReservations(): List<Reservation>
+| + searchReservations(customer: String, date: LocalDate): List<Reservation>
 +------------------------+
 
           |
@@ -57,13 +66,13 @@ Hotel Room Manager là một công cụ quản lý phòng khách sạn với cá
           v
 
 +------------------------+
-|        Room             |
+|        Room            |
 +------------------------+
-| - roomNumber: String    |
-| - roomType: String      |
-| - roomStatus: String    |
+| - roomNumber: String   |
+| - roomType: String     |
+| - roomStatus: String   |
 +------------------------+
-| + getRoomInfo(): String |
+| + getRoomInfo(): String|
 +------------------------+
 
           ^
@@ -71,27 +80,38 @@ Hotel Room Manager là một công cụ quản lý phòng khách sạn với cá
           |
           v
 
-+------------------------+
-|     Reservation         |
-+------------------------+
-| - reservationID: String |
-| - room: Room            |
-| - customerDetails: String |
-+------------------------+
++-------------------------------+
+|        Reservation            |
++-------------------------------+
+| - reservationID: String       |
+| - room: Room                  |
+| - customerDetails: String     |
+| - checkInDate: LocalDate      |
+| - checkOutDate: LocalDate     |
++-------------------------------+
 | + getReservationDetails(): String |
-+------------------------+
-
++-------------------------------+
 ```
 
-
+---
 
 ### Hướng Dẫn Sử Dụng
 
 - Khi chạy ứng dụng, cửa sổ chính sẽ hiện ra danh sách các phòng.
 - Bạn có thể sử dụng các nút trên giao diện để:
   1. Thêm phòng mới.
-  2. Chỉnh sửa thông tin phòng.
-  3. Đặt phòng hoặc hủy đặt phòng.
+  2. Chỉnh sửa hoặc xóa thông tin phòng.
+  3. Đặt phòng với ngày nhận/trả phòng hoặc hủy đặt phòng.
   4. Xem chi tiết từng phòng và tình trạng sử dụng.
+  5. Xem danh sách đặt phòng, tìm kiếm theo tên khách hoặc ngày.
+  6. Kiểm tra phòng trống theo khoảng ngày.
 
-Giao diện Swing hỗ trợ tương tác trực tiếp với người dùng, các form nhập liệu và bảng thông tin rõ ràng.
+Giao diện Swing hỗ trợ tương tác trực tiếp với người dùng, các form nhập liệu và bảng thông tin rõ ràng.  
+Giao diện dòng lệnh (Text-based UI) cho phép thao tác nhanh qua terminal.
+
+---
+
+## Credits
+
+**Engineered by @kiyosnguyen5**  
+*Coded with GitHub Copilot

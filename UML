@@ -7,6 +7,9 @@
 | + bookRoom(room: Room, customerDetails: String): Reservation |
 | + cancelBooking(reservation: Reservation): void |
 | + viewRooms(): List<Room> |
+| + getAvailableRooms(...): List<Room> |
+| + getReservations(): List<Reservation> |
+| + searchReservations(...): List<Reservation> |
 +------------------------+
 
           |
@@ -29,12 +32,14 @@
           |
           v
 
-+------------------------+
-|     Reservation         |
-+------------------------+
-| - reservationID: String |
-| - room: Room            |
-| - customerDetails: String |
-+------------------------+
-| + getReservationDetails(): String |
-+------------------------+
++---------------------+
+|    Reservation      |
++---------------------+
+| - reservationID     |
+| - customerName      |
+| - room              |
+| - checkInDate       |
+| - checkOutDate      |
++---------------------+
+| +getReservationDetails() |
++---------------------+
