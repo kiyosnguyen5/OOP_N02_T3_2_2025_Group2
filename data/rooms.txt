@@ -1,2 +1,5 @@
 211,single,booked
 113,single,available
+112,double,available
+111,single,available
+124,single,available
