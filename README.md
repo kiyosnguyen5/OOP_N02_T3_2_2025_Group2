@@ -117,8 +117,7 @@ Giao diện dòng lệnh (Text-based UI) cho phép thao tác nhanh qua terminal.
 
 
 ##V1 Tính năng chính:
-**Quản lý phòng:**
- Thêm, xóa phòng, xem danh sách phòng với trạng thái (đã đặt/chưa đặt), loại phòng (single/double), số tầng.
+**Quản lý phòng:** Thêm, xóa phòng, xem danh sách phòng với trạng thái (đã đặt/chưa đặt), loại phòng (single/double), số tầng.
 **Đặt phòng:** Đặt phòng cho khách, nhập tên khách, ngày nhận/trả phòng, kiểm tra trùng lịch.
 **Hủy đặt phòng:** Hủy đặt phòng theo mã đặt phòng.
 **Lọc phòng:** Lọc theo tầng, trạng thái (đã đặt/chưa đặt), loại phòng (single/double) bằng popup tiện lợi.
