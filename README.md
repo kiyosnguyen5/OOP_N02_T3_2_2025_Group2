@@ -39,6 +39,10 @@ Hotel Room Manager là một công cụ quản lý phòng khách sạn với cá
 │ │ │ └── Main.java # Lớp chạy chính của ứng dụng
 │
 └── README.md # Tệp này
+│
+└── UML.txt # UML dạng text based
+└── rooms.txt # data
+└── reservations.txt # data
 ```
 
 ## UML
