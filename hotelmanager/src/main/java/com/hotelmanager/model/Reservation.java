@@ -1,6 +1,7 @@
 package com.hotelmanager.model;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class Reservation {
     private String reservationID;
@@ -24,10 +25,11 @@ public class Reservation {
     public LocalDate getCheckOutDate() { return checkOutDate; }
 
     public String getReservationDetails() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         return "ReservationID: " + reservationID +
                ", Room: " + room.getRoomNumber() +
                ", Customer: " + customerDetails +
-               ", Check-in: " + checkInDate +
-               ", Check-out: " + checkOutDate;
+               ", Check-in: " + checkInDate.format(formatter) +
+               ", Check-out: " + checkOutDate.format(formatter);
     }
 }

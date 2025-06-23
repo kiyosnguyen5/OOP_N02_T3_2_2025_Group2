@@ -149,5 +149,9 @@ public class HotelRoomManager {
         return result;
     }
 
-    // Add methods for editRoom, deleteRoom, etc. as needed
+    public void deleteRoom(Room room) {
+        rooms.remove(room);
+    }
+
+    // Add methods for editRoom, etc. as needed
 }

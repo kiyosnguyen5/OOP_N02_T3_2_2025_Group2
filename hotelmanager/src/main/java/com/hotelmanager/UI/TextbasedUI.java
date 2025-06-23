@@ -30,6 +30,7 @@ public class TextbasedUI {
             System.out.println("6. Search Reservations");
             System.out.println("7. Check Available Rooms by Date");
             System.out.println("8. Exit");
+            System.out.println("9. Remove Room");
             System.out.print("Choose an option: ");
             int choice = Integer.parseInt(scanner.nextLine());
 
@@ -53,10 +54,21 @@ public class TextbasedUI {
                     }
                     break;
                 case 3:
+                    // Show all rooms before booking
+                    List<Room> allRooms = manager.viewRooms();
+                    if (allRooms.isEmpty()) {
+                        System.out.println("No rooms available to book.");
+                        break;
+                    } else {
+                        System.out.println("Available rooms:");
+                        for (Room room : allRooms) {
+                            System.out.println(room.getRoomInfo());
+                        }
+                    }
                     System.out.print("Enter room number to book: ");
                     String bookNumber = scanner.nextLine();
                     Room roomToBook = null;
-                    for (Room room : manager.viewRooms()) {
+                    for (Room room : allRooms) {
                         if (room.getRoomNumber().equals(bookNumber)) {
                             roomToBook = room;
                             break;
@@ -68,10 +80,26 @@ public class TextbasedUI {
                     }
                     System.out.print("Enter customer name: ");
                     String customer = scanner.nextLine();
-                    System.out.print("Enter check-in date (dd-MM-yyyy): ");
-                    LocalDate checkIn = LocalDate.parse(scanner.nextLine(), formatter);
-                    System.out.print("Enter check-out date (dd-MM-yyyy): ");
-                    LocalDate checkOut = LocalDate.parse(scanner.nextLine(), formatter);
+
+                    LocalDate checkIn = null, checkOut = null;
+                    while (true) {
+                        try {
+                            System.out.print("Enter check-in date (dd-MM-yyyy): ");
+                            checkIn = LocalDate.parse(scanner.nextLine(), formatter);
+                            break;
+                        } catch (Exception ex) {
+                            System.out.println("Invalid date format! Please enter as dd-MM-yyyy (e.g., 05-02-2005).");
+                        }
+                    }
+                    while (true) {
+                        try {
+                            System.out.print("Enter check-out date (dd-MM-yyyy): ");
+                            checkOut = LocalDate.parse(scanner.nextLine(), formatter);
+                            break;
+                        } catch (Exception ex) {
+                            System.out.println("Invalid date format! Please enter as dd-MM-yyyy (e.g., 05-02-2005).");
+                        }
+                    }
                     Reservation reservation = manager.bookRoom(roomToBook, customer, checkIn, checkOut);
                     if (reservation != null) {
                         System.out.println("Reservation successful:");
@@ -125,17 +153,51 @@ public class TextbasedUI {
                     }
                     break;
                 case 7:
-                    System.out.print("Enter check-in date (dd-MM-yyyy): ");
-                    LocalDate avCheckIn = LocalDate.parse(scanner.nextLine(), formatter);
-                    System.out.print("Enter check-out date (dd-MM-yyyy): ");
-                    LocalDate avCheckOut = LocalDate.parse(scanner.nextLine(), formatter);
+                    LocalDate avCheckIn = null, avCheckOut = null;
+                    while (true) {
+                        try {
+                            System.out.print("Enter check-in date (dd-MM-yyyy): ");
+                            String checkInStr = scanner.nextLine();
+                            avCheckIn = LocalDate.parse(checkInStr, formatter);
+                            break;
+                        } catch (Exception ex) {
+                            System.out.println("Invalid date format! Please enter as dd-MM-yyyy (e.g., 05-02-2005).");
+                        }
+                    }
+                    while (true) {
+                        try {
+                            System.out.print("Enter check-out date (dd-MM-yyyy): ");
+                            String checkOutStr = scanner.nextLine();
+                            avCheckOut = LocalDate.parse(checkOutStr, formatter);
+                            break;
+                        } catch (Exception ex) {
+                            System.out.println("Invalid date format! Please enter as dd-MM-yyyy (e.g., 05-02-2005).");
+                        }
+                    }
                     List<Room> availableRooms = manager.getAvailableRooms(avCheckIn, avCheckOut);
                     if (availableRooms.isEmpty()) {
                         System.out.println("No rooms available for the selected dates.");
                     } else {
                         System.out.println("Available rooms:");
                         for (Room r : availableRooms) {
-                            System.out.println(r.getRoomInfo());
+                            System.out.print(r.getRoomInfo());
+                            boolean bookedFound = false;
+                            for (Reservation res : manager.getReservations()) {
+                                if (res.getRoom().getRoomNumber().equals(r.getRoomNumber())) {
+                                    if (!(avCheckOut.isBefore(res.getCheckInDate()) || avCheckIn.isAfter(res.getCheckOutDate()))) {
+                                        // Format the dates as dd-MM-yyyy
+                                        String checkInFormatted = res.getCheckInDate().format(formatter);
+                                        String checkOutFormatted = res.getCheckOutDate().format(formatter);
+                                        System.out.print(" [BOOKED: " + checkInFormatted + " to " + checkOutFormatted + "]");
+                                        bookedFound = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!bookedFound && r.getRoomStatus().equalsIgnoreCase("booked")) {
+                                System.out.print(" [BOOKED]");
+                            }
+                            System.out.println();
                         }
                     }
                     break;
@@ -146,6 +208,34 @@ public class TextbasedUI {
                     System.out.println("Exiting...");
                     scanner.close();
                     return;
+
+                case 9:
+                    // Remove a room
+                    List<Room> currentRooms = manager.viewRooms();
+                    if (currentRooms.isEmpty()) {
+                        System.out.println("No rooms to remove.");
+                        break;
+                    }
+                    System.out.println("Current rooms:");
+                    for (Room room : currentRooms) {
+                        System.out.println(room.getRoomInfo());
+                    }
+                    System.out.print("Enter room number to remove: ");
+                    String removeNumber = scanner.nextLine();
+                    Room roomToRemove = null;
+                    for (Room room : currentRooms) {
+                        if (room.getRoomNumber().equals(removeNumber)) {
+                            roomToRemove = room;
+                            break;
+                        }
+                    }
+                    if (roomToRemove == null) {
+                        System.out.println("Room not found.");
+                    } else {
+                        manager.deleteRoom(roomToRemove);
+                        System.out.println("Room removed.");
+                    }
+                    break;
                 default:
                     System.out.println("Invalid option.");
             }
