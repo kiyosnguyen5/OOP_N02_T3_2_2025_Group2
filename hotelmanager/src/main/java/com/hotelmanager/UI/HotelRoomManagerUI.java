@@ -1,18 +1,19 @@
 package com.hotelmanager.UI;
 
-import com.formdev.flatlaf.FlatLightLaf; // Add this import
-
+import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.*;
 import javax.swing.*;
-
+import java.awt.event.*;
 import java.util.List;
-
+import java.time.format.DateTimeFormatter;
 import com.hotelmanager.model.Reservation;
 import com.hotelmanager.model.Room;
 import com.hotelmanager.service.HotelRoomManager;
 
 public class HotelRoomManagerUI extends JFrame {
     private HotelRoomManager manager;
+    private DefaultListModel<String> roomListModel;
+    private JList<String> roomList;
     private JTextArea outputArea;
 
     public HotelRoomManagerUI() {
@@ -21,22 +22,38 @@ public class HotelRoomManagerUI extends JFrame {
         manager.loadReservationsFromFile("data/reservations.txt");
 
         setTitle("Hotel Room Manager");
-        setSize(600, 450);
+        setSize(800, 500);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Modern font
         Font font = new Font("Segoe UI", Font.PLAIN, 16);
 
-        // Header panel
         JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(new Color(33, 150, 243)); // Material blue
+        headerPanel.setBackground(new Color(33, 150, 243));
         JLabel titleLabel = new JLabel("Hotel Room Manager");
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
         headerPanel.add(titleLabel);
 
-        // Output area
+        // Room list panel
+        roomListModel = new DefaultListModel<>();
+        roomList = new JList<>(roomListModel);
+        roomList.setFont(font);
+        JScrollPane roomScrollPane = new JScrollPane(roomList);
+        roomScrollPane.setPreferredSize(new Dimension(350, 0));
+        updateRoomList();
+
+        // Show room details and actions when a room is clicked
+        roomList.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                int index = roomList.locationToIndex(evt.getPoint());
+                if (index >= 0) {
+                    Room selectedRoom = manager.viewRooms().get(index);
+                    showRoomOptions(selectedRoom);
+                }
+            }
+        });
+
         outputArea = new JTextArea();
         outputArea.setEditable(false);
         outputArea.setFont(font);
@@ -44,13 +61,11 @@ public class HotelRoomManagerUI extends JFrame {
         JScrollPane scrollPane = new JScrollPane(outputArea);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Buttons
-        JButton viewRoomsBtn = new JButton("View Rooms");
         JButton addRoomBtn = new JButton("Add Room");
-        JButton bookRoomBtn = new JButton("Book Room");
+        JButton saveBtn = new JButton("Save Data");
         JButton exitBtn = new JButton("Exit");
 
-        JButton[] buttons = {viewRoomsBtn, addRoomBtn, bookRoomBtn, exitBtn};
+        JButton[] buttons = {addRoomBtn, saveBtn, exitBtn};
         for (JButton btn : buttons) {
             btn.setFont(font);
             btn.setFocusPainted(false);
@@ -59,9 +74,12 @@ public class HotelRoomManagerUI extends JFrame {
             btn.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         }
 
-        viewRoomsBtn.addActionListener(e -> viewRooms());
         addRoomBtn.addActionListener(e -> addRoom());
-        bookRoomBtn.addActionListener(e -> bookRoom());
+        saveBtn.addActionListener(e -> {
+            manager.saveRoomsToFile("data/rooms.txt");
+            manager.saveReservationsToFile("data/reservations.txt");
+            outputArea.setText("Data saved successfully.\n");
+        });
         exitBtn.addActionListener(e -> {
             manager.saveRoomsToFile("data/rooms.txt");
             manager.saveReservationsToFile("data/reservations.txt");
@@ -75,24 +93,87 @@ public class HotelRoomManagerUI extends JFrame {
             buttonPanel.add(btn);
         }
 
-        // Main layout
         setLayout(new BorderLayout(0, 0));
         add(headerPanel, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
+
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.add(roomScrollPane, BorderLayout.WEST);
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
+        add(centerPanel, BorderLayout.CENTER);
+
         add(buttonPanel, BorderLayout.SOUTH);
+
+        // Always show room list and details of the first room (if any)
+        if (!manager.viewRooms().isEmpty()) {
+            roomList.setSelectedIndex(0);
+            showRoomDetails(manager.viewRooms().get(0));
+        }
     }
 
-    private void viewRooms() {
+    private void updateRoomList() {
+        roomListModel.clear();
         List<Room> rooms = manager.viewRooms();
+        List<Reservation> reservations = manager.getReservations();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        for (Room room : rooms) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(room.getRoomInfo());
+            boolean bookedFound = false;
+            for (Reservation res : reservations) {
+                if (res.getRoom().getRoomNumber().equals(room.getRoomNumber())) {
+                    sb.append(" [BOOKED: ")
+                      .append(res.getCheckInDate().format(formatter))
+                      .append(" to ")
+                      .append(res.getCheckOutDate().format(formatter))
+                      .append("]");
+                    bookedFound = true;
+                    break;
+                }
+            }
+            if (!bookedFound && room.getRoomStatus().equalsIgnoreCase("booked")) {
+                sb.append(" [BOOKED]");
+            }
+            roomListModel.addElement(sb.toString());
+        }
+    }
+
+    private void showRoomDetails(Room room) {
         StringBuilder sb = new StringBuilder();
-        if (rooms.isEmpty()) {
-            sb.append("No rooms available.\n");
-        } else {
-            for (Room room : rooms) {
-                sb.append(room.getRoomInfo()).append("\n");
+        sb.append(room.getRoomInfo()).append("\n");
+        List<Reservation> reservations = manager.getReservations();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        for (Reservation res : reservations) {
+            if (res.getRoom().getRoomNumber().equals(room.getRoomNumber())) {
+                sb.append("BOOKED: ")
+                  .append(res.getCheckInDate().format(formatter))
+                  .append(" to ")
+                  .append(res.getCheckOutDate().format(formatter))
+                  .append("\nCustomer: ").append(res.getCustomerDetails())
+                  .append("\nReservation ID: ").append(res.getReservationID());
+                break;
             }
         }
         outputArea.setText(sb.toString());
+    }
+
+    private void showRoomOptions(Room room) {
+        String[] options = {"Book Room", "Remove Room", "Cancel"};
+        int choice = JOptionPane.showOptionDialog(this,
+                "Choose an action for room " + room.getRoomNumber(),
+                "Room Options",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]);
+        if (choice == 0) {
+            bookRoom(room);
+        } else if (choice == 1) {
+            removeRoom(room);
+        }
+        // else Cancel, do nothing
+        showRoomDetails(room);
+        updateRoomList();
     }
 
     private void addRoom() {
@@ -109,26 +190,14 @@ public class HotelRoomManagerUI extends JFrame {
             if (!number.isEmpty() && !type.isEmpty()) {
                 manager.addRoom(new Room(number, type, "available"));
                 outputArea.setText("Room added.\n");
+                updateRoomList();
             } else {
                 outputArea.setText("Invalid input.\n");
             }
         }
     }
 
-    private void bookRoom() {
-        String roomNumber = JOptionPane.showInputDialog(this, "Enter room number to book:");
-        if (roomNumber == null) return;
-        Room roomToBook = null;
-        for (Room room : manager.viewRooms()) {
-            if (room.getRoomNumber().equals(roomNumber.trim())) {
-                roomToBook = room;
-                break;
-            }
-        }
-        if (roomToBook == null) {
-            outputArea.setText("Room not found.\n");
-            return;
-        }
+    private void bookRoom(Room roomToBook) {
         String customer = JOptionPane.showInputDialog(this, "Enter customer name:");
         if (customer == null) return;
 
@@ -142,7 +211,7 @@ public class HotelRoomManagerUI extends JFrame {
         if (result != JOptionPane.OK_OPTION) return;
 
         try {
-            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             java.time.LocalDate checkIn = java.time.LocalDate.parse(checkInField.getText().trim(), formatter);
             java.time.LocalDate checkOut = java.time.LocalDate.parse(checkOutField.getText().trim(), formatter);
 
@@ -155,10 +224,22 @@ public class HotelRoomManagerUI extends JFrame {
         } catch (Exception ex) {
             outputArea.setText("Invalid date format. Please use dd-MM-yyyy.\n");
         }
+        updateRoomList();
+    }
+
+    private void removeRoom(Room roomToRemove) {
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to remove room " + roomToRemove.getRoomNumber() + "?",
+                "Confirm Remove",
+                JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            manager.deleteRoom(roomToRemove);
+            outputArea.setText("Room removed.\n");
+            updateRoomList();
+        }
     }
 
     public static void main(String[] args) {
-        // Set FlatLaf look and feel
         try {
             FlatLightLaf.setup();
         } catch (Exception ex) {
